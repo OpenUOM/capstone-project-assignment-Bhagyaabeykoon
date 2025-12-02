@@ -25,7 +25,7 @@ export class StudentTableComponent implements OnInit {
     this.router.navigate(['addStudent'])
   }
 
-  editStudent(id){
+  editStudent(id: any){
     const navigationExtras: NavigationExtras = {
       state: {
         id : id
@@ -42,7 +42,7 @@ export class StudentTableComponent implements OnInit {
     })
   }
 
-  deleteStudent(itemid){
+  deleteStudent(itemid: any){
     const student = {
       id: itemid
     }
@@ -51,17 +51,22 @@ export class StudentTableComponent implements OnInit {
     })
   }
 
-  search(value) {
-    let foundItems = [];
-    if (value.length <= 0) {
+  search(value: string) {
+    const searchText = (value || '').trim().toLowerCase();
+
+    // If empty input → reload full list
+    if (!searchText) {
       this.getStudentData();
-    } else {
-      let b = this.studentData.filter((student) => {
-        if (student[0].name.toLowerCase().indexOf(value) > -1) {
-          foundItems.push(student)
-        }
-      });
-      this.studentData = foundItems;
+      return;
     }
+
+    // studentData looks like [ [studentObj], [studentObj], ... ]
+    const foundItems = this.studentData.filter((student: any) => {
+      const obj = Array.isArray(student) ? student[0] : student; // handle [obj] format
+      const name = (obj?.name || '').toLowerCase();
+      return name.includes(searchText); // matches start/middle/end
+    });
+
+    this.studentData = foundItems;
   }
 }
